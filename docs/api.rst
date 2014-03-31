@@ -6,6 +6,8 @@ API
 Base
 ----
 
+.. py:module:: invenio.base
+
 .. automodule:: invenio.base.factory
    :members:
 
