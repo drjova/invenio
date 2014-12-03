@@ -62,7 +62,8 @@ from invenio.config import \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_NEW, \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_ON_ORDER, \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_PUT_ASIDE, \
-    CFG_BIBCIRCULATION_PROPOSAL_STATUS_RECEIVED
+    CFG_BIBCIRCULATION_PROPOSAL_STATUS_RECEIVED, \
+    CFG_ELASTICSEARCH_LOGGING
 
 # templates used to notify borrowers
 if CFG_CERN_SITE == 1:
@@ -464,3 +465,20 @@ CFG_BIBCIRCULATION_ACQ_STATUS = [CFG_BIBCIRCULATION_ACQ_STATUS_NEW,
                                  CFG_BIBCIRCULATION_ACQ_STATUS_PARTIAL_RECEIPT,
                                  CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED,
                                  CFG_BIBCIRCULATION_ACQ_STATUS_CANCELLED]
+
+# Register the elastic search schemas
+if CFG_ELASTICSEARCH_LOGGING:
+    from invenio.elasticsearch_logging import register_schema
+    register_schema('loan.request', {
+        '_source': {
+            'enabled': True
+        },
+        'properties': {
+            'request_id': {
+                'type': 'integer'
+            },
+            'load_id': {
+                'type': 'integer'
+            }
+        }
+    })

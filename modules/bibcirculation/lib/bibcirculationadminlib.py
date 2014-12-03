@@ -37,6 +37,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import datetime, time, types
+from logging import getLogger
 
 # Other Invenio imports
 from invenio.config import \
@@ -74,7 +75,8 @@ from invenio.config import \
     CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED, \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_ON_ORDER, \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_PUT_ASIDE, \
-    CFG_BIBCIRCULATION_PROPOSAL_STATUS_RECEIVED
+    CFG_BIBCIRCULATION_PROPOSAL_STATUS_RECEIVED, \
+    CFG_ELASTICSEARCH_LOGGING
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
@@ -684,11 +686,20 @@ def register_new_loan(req, barcode, borrower_id,
             last_id = db.new_loan(borrower_id, recid, barcode,
                         due_date, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
                         'normal', note_format)
-            # register event in webstat
-            try:
-                register_customevent("loanrequest", [request_id, last_id])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
+            if CFG_ELASTICSEARCH_LOGGING:
+                logger = logging.getLogger('loan.request')
+                log_event = {
+                    'request_id': request_id,
+                    'loan_id': last_id
+                }
+                logger.info(log_event)
+            else:
+                # register event in webstat
+                try:
+                    register_customevent("loanrequest", [request_id, last_id])
+                except:
+                    register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             tag_all_requests_as_done(barcode, borrower_id)
 
