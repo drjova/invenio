@@ -1,19 +1,19 @@
-# This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
-#
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## This file is part of Invenio.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
@@ -33,8 +33,11 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \
-     CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
-from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
+     CFG_WEBSTAT_BIBCIRCULATION_START_YEAR, \
+     CFG_ELASTICSEARCH_LOGGING
+from invenio.webstat_config import \
+    CFG_WEBSTAT_CONFIG_PATH, \
+    CFG_ELASTICSEARCH_EVENTS_MAP
 from invenio.bibindex_engine_utils import get_all_indexes
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.search_engine import get_coll_i18nname, \
@@ -111,6 +114,9 @@ from invenio.webstat_engine import create_graph_trend, \
 from invenio.webstat_engine import export_to_python, \
     export_to_csv, \
     export_to_file
+
+if CFG_ELASTICSEARCH_LOGGING:
+    from logging import getLogger
 
 TEMPLATES = template.load('webstat')
 
@@ -724,6 +730,7 @@ def destroy_customevents():
         msg += destroy_customevent(event[0])
     return msg
 
+
 def register_customevent(event_id, *arguments):
     """
     Registers a custom event. Will add to the database's event tables
@@ -739,17 +746,25 @@ def register_customevent(event_id, *arguments):
     @param *arguments: The rest of the parameters of the function call
     @type *arguments: [params]
     """
-    res = run_sql("SELECT CONCAT('staEVENT', number),cols " + \
-                      "FROM staEVENT WHERE id = %s", (event_id, ))
+    query = """
+        SELECT  CONCAT('staEVENT', number),
+                cols
+        FROM    staEVENT
+        WHERE   id = %s
+    """
+    params = (event_id,)
+    res = run_sql(query, params)
+    # the id does not exist
     if not res:
-        return # the id does not exist
+        return
     tbl_name = res[0][0]
     if res[0][1]:
         col_titles = cPickle.loads(res[0][1])
     else:
         col_titles = []
     if len(col_titles) != len(arguments[0]):
-        return # there is different number of arguments than cols
+        # there is different number of arguments than cols
+        return
 
     # Make sql query
     if len(arguments[0]) != 0:
@@ -758,18 +773,36 @@ def register_customevent(event_id, *arguments):
         for title in col_titles:
             sql_query.append("`%s`" % title)
             sql_query.append(",")
-        sql_query.pop() # del the last ','
+        # del the last ','
+        sql_query.pop()
         sql_query.append(") VALUES (")
         for argument in arguments[0]:
             sql_query.append("%s")
             sql_query.append(",")
             sql_param.append(argument)
-        sql_query.pop() # del the last ','
+        # del the last ','
+        sql_query.pop()
         sql_query.append(")")
         sql_str = ''.join(sql_query)
         run_sql(sql_str, tuple(sql_param))
+
+        # Register the event on elastic search
+        if CFG_ELASTICSEARCH_LOGGING and \
+            "events.{0}".format(event_id) in \
+                CFG_ELASTICSEARCH_EVENTS_MAP.keys():
+            # Initialize elastic search handler
+            elastic_search_parameters = zip(col_titles, arguments[0])
+            event_logger_name = "events.{0}".format(event_id)
+            logger = getLogger(event_logger_name)
+            log_event = {}
+            for key, value in elastic_search_parameters:
+                log_event[key] = value
+            logger.info(log_event)
     else:
-        run_sql("INSERT INTO %s () VALUES ()" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
+        # kwalitee: disable=sql
+        run_sql(
+            "INSERT INTO %s () VALUES ()" % wash_table_column_name(tbl_name)
+        )
 
 
 def cache_keyevent_trend(ids=[]):
