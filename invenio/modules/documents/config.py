@@ -21,7 +21,9 @@
 
 from __future__ import unicode_literals
 
-from invenio.base import config
+from werkzeug.local import LocalProxy
+
+from invenio.base.globals import cfg
 
 DOCUMENTS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
                     ':SQLAlchemyStorage')
@@ -34,5 +36,5 @@ DOCUMENTS_MONGODBSTORAGE = {
     'model': 'Document',
     'host': "localhost",
     'port': 27017,
-    'database': config.CFG_DATABASE_NAME,
+    'database': LocalProxy(lambda: cfg['CFG_DATABASE_NAME']),
 }
