@@ -18,8 +18,6 @@
 #}
 
 <link rel="stylesheet" href="/css/video_platform_record.css" type="text/css" />
-<link rel="stylesheet" href="/vendors/mediaelement/build/mediaelementplayer.css" type="text/css" />
-<script type="text/javascript" src="/vendors/mediaelement/build/mediaelement-and-player.js"></script>
 <script type="text/javascript" src="/js/video_platform_record.js"></script>
 
 <!-- VIDEO PLAYER -->

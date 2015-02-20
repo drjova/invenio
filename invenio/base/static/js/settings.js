@@ -51,6 +51,7 @@ require.config({
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
+    "mediaelement": "vendors/mediaelement/build/mediaelement-and-player",
   },
   shim: {
     jquery: {
@@ -147,6 +148,9 @@ require.config({
     },
     "jasmine-initialization": {
       deps: ["jasmine-boot"],
+    },
+    "mediaelement": {
+      deps: ["jquery"],
     },
   }
 });

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -64,5 +64,23 @@ pdftkcss = Bundle(
     "css/previewer/pdf_viewer.css",
     filters=CleanCSSFilter(),
     output="previewer/pdftk.css",
+    weight=20
+)
+
+videojs = Bundle(
+    "js/previewer/video/init.js",
+    filters=RequireJSFilter(),
+    output="previewer/video.js",
+    weight=20,
+    bower={
+        "mediaelement": "latest"
+    }
+)
+
+videocss = Bundle(
+    "vendors/mediaelement/build/mediaelementplayer.css",
+    "css/previewer/video/video.css",
+    filters=CleanCSSFilter(),
+    output="previewer/video.css",
     weight=20
 )

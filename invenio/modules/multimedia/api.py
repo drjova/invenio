@@ -28,6 +28,7 @@ from six import StringIO
 from PIL import Image
 from invenio.modules.documents.api import Document
 from invenio.modules.documents.errors import DocumentNotFound
+from invenio.modules.records.api import Record
 from .config import (
     MULTIMEDIA_IMAGE_API_SUPPORTED_FORMATS, MULTIMEDIA_IMAGE_CACHE_TIME,
     MULTIMEDIA_IMAGE_API_QUALITIES, MULTIMEDIA_IMAGE_API_COVERTERS,
@@ -45,6 +46,55 @@ from .utils import initialize_redis
 class MultimediaObject(object):
 
     """The Multimedia Object."""
+
+
+class MultimediaVideo(MultimediaObject):
+
+    """Multimedia Video API."""
+
+    info = {}
+
+    def __init__(self, data):
+        """ Init."""
+        if not data:
+            raise
+        self.data = data
+        self.info = self._build()
+
+    @classmethod
+    def from_record(cls, record_id):
+        """Get from record_id"""
+        record = Record.get_record(record_id)
+        return cls(record.get('files'))
+
+    @classmethod
+    def from_uuid(cls, uuid):
+        """Get from uuid"""
+        raise NotImplementedError
+
+    def _build(self):
+        """Build the data."""
+        # first build the video formats
+        videos = dict(poster=dict())
+        for f in self.data:
+            if f.get('superformat') in ['.webm', '.mp4', '.ogv'] and f.get('subformat') in ['360p', '480p', '720p', '1080p']:
+                codec = f.get('superformat', [])[1:]
+                try:
+                    videos[f.get('subformat')].update({codec: f.get('url')})
+                except KeyError:
+                    videos.update({f.get('subformat'): {}})
+                    videos[f.get('subformat')].update({codec: f.get('url')})
+
+            if f.get('comment') in ('BIGTHUMB', 'SMALLTHUMB') and f.get('subformat') in ('big', 'small'):
+                videos['poster'].update({f.get('subformat'): f.get('url')})
+
+        return videos
+
+    def qualities(self):
+        """Return qualities. """
+
+    def poster(self, size=None):
+        """Return the url of specific poster."""
 
 
 class MultimediaImage(MultimediaObject):

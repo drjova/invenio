@@ -56,7 +56,7 @@ $(document).ready(function() {
 					this.onchange = function() {
 						initiate_video(this, $('#mediaelement')[0]);
 						player.options.alwaysShowControls = false;
-						
+
 					};
 				// Makes the control bar of ME player fade in a nice way when we change the source
 					this.onmouseover = function() {
@@ -81,9 +81,9 @@ $(document).ready(function() {
 		if (!player.isVideo)
 			return;
 
-		var			 
+		var
 			container = player.container,
-			fullscreenBtn = 
+			fullscreenBtn =
 				$('<div class="mejs-button mejs-fullscreen-button"><button type="button"></button></div>')
 				.appendTo(controls)
 				.click(function() {
@@ -175,7 +175,7 @@ $(document).ready(function() {
 function initiate_video(dropdown, video) {
 	// If no video element is given, fail
 	if(!video) return;
-	
+
 	// Initialise variables from dropdown (html select element) data attributes
 	var webm_src = $(dropdown.options[dropdown.selectedIndex]).attr('data-src-webm');
 	var ogv_src = $(dropdown.options[dropdown.selectedIndex]).attr('data-src-ogv');
@@ -186,11 +186,11 @@ function initiate_video(dropdown, video) {
 	var poster_src = $(dropdown.options[dropdown.selectedIndex]).attr('data-poster');
 	var video_width = $(dropdown.options[dropdown.selectedIndex]).attr('data-video-width');
 	var video_height = $(dropdown.options[dropdown.selectedIndex]).attr('data-video-height');
-	
+
 	// The video might have been running, save its position
 	var position = video.currentTime;
 	var playing = !(video.paused);
-	
+
 	// After the video was loaded, jump to the old position
 	try {
 		video.addEventListener("loadedmetadata", function() {
@@ -201,20 +201,20 @@ function initiate_video(dropdown, video) {
 		}, true);
 	}
 	catch(err) {
-		// IE will crash 
+		// IE will crash
 	};
-	
+
 	// Set the new dimensions
 	video.style.width = video_width;
 	video.style.height = video_height;
 	normalWidth = video_width;
 	normalHeight = video_height;
-		
+
 	// Apply the new poster
 	if (poster_src != "None") {
 		$(video).attr("poster", poster_src);
 	};
-	
+
 	// Determine which video should be played and set it as source
 	// First check HTML5 support
 	if (!!document.createElement('video').canPlayType) {
@@ -247,10 +247,10 @@ function initiate_video(dropdown, video) {
 			};
 		}
 		catch(err) {
-			
+
 		};
 	};
-	
+
 	// Update the mediaelement
 	try {
 		if(!video.player.media.isFullScreen) {
@@ -273,10 +273,10 @@ function initiate_video(dropdown, video) {
 	catch(err) {
 		// Mediaelement was not initialized
 	};
-	
+
 	// Make the control visible
 	dropdown.style.display = "inline";
-	
+
 	// Reload the video
 
 	try {
