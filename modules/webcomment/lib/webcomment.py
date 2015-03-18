@@ -2376,7 +2376,6 @@ def toggle_comment_visibility(uid, comid, collapse, recid, force=False):
             run_sql(query, params)
 
     if collapse:
-        splited_comment_ids = comid.split(',')
         for comment_id in splited_comment_ids:
             query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
             params = (comment_id,)
