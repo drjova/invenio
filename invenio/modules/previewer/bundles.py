@@ -68,3 +68,21 @@ pdftkcss = Bundle(
     output="previewer/pdftk.css",
     weight=20
 )
+
+videojs = Bundle(
+    "js/previewer/video/init.js",
+    filters=RequireJSFilter(),
+    output="previewer/video.js",
+    weight=20,
+    bower={
+        "mediaelement": "latest"
+    }
+)
+
+videocss = Bundle(
+    "vendors/mediaelement/build/mediaelementplayer.css",
+    "css/previewer/video/video.css",
+    filters=CleanCSSFilter(),
+    output="previewer/video.css",
+    weight=20
+)

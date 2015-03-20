@@ -82,3 +82,8 @@ class MultimediaImageFormatError(MultimediaError):
 class IIIFValidatorError(MultimediaError):
 
     """IIIF API validator error."""
+
+
+class MultimediaVideoNotFound(MultimediaError):
+
+    """Video not found error."""

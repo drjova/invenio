@@ -1,6 +1,10 @@
 /*
  * This file is part of Invenio.
+<<<<<<< HEAD
  * Copyright (C) 2014, 2015 CERN.
+=======
+ * Copyright (C) 2015 CERN.
+>>>>>>> wip vidoe
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -53,6 +57,7 @@ require.config({
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
     "select2": "vendor/select2/select2.min",
+    "mediaelement": "vendors/mediaelement/build/mediaelement-and-player",
   },
   shim: {
     jquery: {
@@ -150,9 +155,15 @@ require.config({
     "jasmine-initialization": {
       deps: ["jasmine-boot"],
     },
+<<<<<<< HEAD
     select2: {
       deps: ["jquery"],
       exports: "select2"
     },
+=======
+    "mediaelement": {
+      deps: ["jquery"]
+    }
+>>>>>>> wip vidoe
   }
 });

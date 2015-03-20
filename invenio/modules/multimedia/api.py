@@ -28,16 +28,20 @@ from six import StringIO
 from PIL import Image
 from invenio.modules.documents.api import Document
 from invenio.modules.documents.errors import DocumentNotFound
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from .config import (
     MULTIMEDIA_IMAGE_API_SUPPORTED_FORMATS, MULTIMEDIA_IMAGE_CACHE_TIME,
     MULTIMEDIA_IMAGE_API_QUALITIES, MULTIMEDIA_IMAGE_API_COVERTERS,
-    IIIF_API_VALIDATIONS
+    IIIF_API_VALIDATIONS, MULTIMEDIA_VIDEO_API_QUALITIES,
+    MULTIMEDIA_VIDEO_API_SUPPORTED_FORMATS,
+    MULTIMEDIA_VIDEO_API_SUPPORTED_STREAM_FORMATS,
+    MULTIMEDIA_VIDEO_API_SUPPORTED_POSTERS
 )
 from .errors import (
     MultmediaImageCropError, MultmediaImageResizeError,
     MultimediaImageFormatError, MultimediaImageRotateError,
     MultimediaImageQualityError, MultimediaImageNotFound,
-    IIIFValidatorError
+    IIIFValidatorError, MultimediaVideoNotFound
 )
 from .utils import initialize_redis
 
@@ -45,6 +49,101 @@ from .utils import initialize_redis
 class MultimediaObject(object):
 
     """The Multimedia Object."""
+
+
+class MultimediaVideo(MultimediaObject):
+
+    """Multimedia Video API."""
+
+    def __init__(self, videos, posters):
+        """Initialize the object."""
+        self.videos = videos
+        self.posters = posters
+
+    @classmethod
+    def get_video(cls, uuid):
+        """Get the video by uuid.
+
+        :param str uuid: The video uuid
+
+        Example using the api:
+
+        .. code-block:: python
+
+            data = MultimediaVideo.get_video(uuid)
+            # use the videos
+            videos = data.videos()
+            # use the posters
+            posters = data.posters()
+
+        .. note::
+
+            If the document not found it will try to get it from
+            legacy `::obj::BibRecDocs`
+        """
+        try:
+            videos, posters = MultimediaVideo._video_from_document(uuid)
+        except DocumentNotFound:
+            # try with bibdoc
+            videos, posters = MultimediaVideo._video_from_bibdocfile(uuid)
+        except Exception:
+            raise MultimediaVideoNotFound(
+                "The requested video {0} not found".format(uuid)
+            )
+        return cls(videos, posters)
+
+    @staticmethod
+    def _video_from_bibdocfile(record_id):
+        """Initialize the object from bibdocfile.
+
+        :param int record_id: The record id
+        """
+        record_doc = BibRecDocs(record_id)
+        bibdocs = record_doc.list_bibdocs()
+        if not bibdocs:
+            raise MultimediaVideoNotFound
+
+        videos = []
+        for bibdoc in bibdocs:
+            bibdocfiles = bibdoc.list_all_files()
+            for bibdocfile in bibdocfiles:
+                if bibdocfile.get_superformat() in \
+                        MULTIMEDIA_VIDEO_API_SUPPORTED_FORMATS:
+                    src = bibdocfile.get_url()
+                    codec = bibdocfile.get_superformat()[1:]
+                    quality = bibdocfile.get_subformat()
+                    size = MultimediaVideo.human_size(bibdocfile.get_size())
+                    streamable = bibdocfile.get_superformat() in \
+                        MULTIMEDIA_VIDEO_API_SUPPORTED_STREAM_FORMATS
+                    videos.append(dict(src=src, codec=codec, quality=quality,
+                                       size=size, streamable=streamable))
+        # search for posters
+        posters = dict()
+        for bibdoc in bibdocs:
+            bibdocfiles = bibdoc.list_all_files()
+            for bibdocfile in bibdocfiles:
+                if bibdocfile.get_comment() in \
+                        MULTIMEDIA_VIDEO_API_SUPPORTED_POSTERS:
+                    posters.update(
+                        {bibdocfile.get_subformat(): bibdocfile.get_url()}
+                    )
+        return videos, posters
+
+    @staticmethod
+    def _video_from_document(document):
+        """Initialize the object from document."""
+        raise DocumentNotFound
+
+    @staticmethod
+    def human_size(size):
+        """File size in human readable format.
+
+        :param int size: The file size
+        """
+        for slug in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+            if size < 1024.0:
+                return "%3.1f %s" % (size, slug)
+            size /= 1024.0
 
 
 class MultimediaImage(MultimediaObject):

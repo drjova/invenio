@@ -41,6 +41,16 @@ MULTIMEDIA_IMAGE_API_SUPPORTED_FORMATS = {
     'png': 'image/png',
 }
 
+MULTIMEDIA_VIDEO_API_QUALITIES = ('360p', '480p', '720p', '1080p', )
+MULTIMEDIA_VIDEO_API_SUPPORTED_FORMATS = (
+    '.mpg', '.mp4', '.webm', '.ogv', '.mov', '.wmv', '.avi', '.mpeg', '.flv',
+    '.mkv'
+)
+MULTIMEDIA_VIDEO_API_SUPPORTED_STREAM_FORMATS = ('.webm', '.ogv', '.mp4',)
+
+MULTIMEDIA_VIDEO_API_SUPPORTED_POSTERS = ('BIGTHUMB', 'SMALLTHUMB', )
+
+
 # Regular expressions to validate each parameter of iiif API v2.0
 IIIF_API_VALIDATIONS = {
     "v1": {
