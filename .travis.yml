@@ -54,6 +54,7 @@ install:
   - "travis_retry pip install -r requirements.txt --quiet"
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
   - "travis_retry pip install -e .[docs] --quiet --process-dependency-links"
+  - "travis_retry pip install -e .[img] --quiet"
   - "python setup.py compile_catalog"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask_email.backends.console.Mail"
