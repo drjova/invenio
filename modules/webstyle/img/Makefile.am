@@ -317,10 +317,10 @@ img_DATA = add-small.png \
            openid_icon_48.png \
            twitter_icon_24.png \
            twitter_icon_48.png \
-	   viaf.png \
+           viaf.png \
            verisign_icon_24.png \
            verisign_icon_48.png \
-	   wikipedia.png \
+           wikipedia.png \
            wordpress_icon_24.png \
            wordpress_icon_48.png \
            yahoo_icon_24.png \
@@ -328,6 +328,14 @@ img_DATA = add-small.png \
            yammer_icon_24.png \
            yammer_icon_48.png \
            filter_filled.png
+           yoursearches_alert.png \
+           yoursearches_alert_edit.png \
+           yoursearches_search.png \
+           youralerts_alert.png \
+           youralerts_alert_delete.png \
+           youralerts_alert_edit.png \
+           youralerts_alert_pause.png \
+           youralerts_alert_resume.png
 
 tmpdir=$(localstatedir)/tmp
 
