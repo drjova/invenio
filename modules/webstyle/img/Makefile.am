@@ -47,7 +47,7 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-	         application_pdf.png \
+           application_pdf.png \
            authorlist_ui-bg_diagonals-thick_90_eeeeee_40x40.png \
            authorlist_ui-bg_flat_100_6699cc_40x100.png \
            authorlist_ui-bg_flat_100_bcc5d2_40x100.png \
@@ -336,6 +336,8 @@ img_DATA = add-small.png \
            youralerts_alert_edit.png \
            youralerts_alert_pause.png \
            youralerts_alert_resume.png
+           sign_in_with_google.png \
+           youtube-logo-icon-24px.png
 
 tmpdir=$(localstatedir)/tmp
 
