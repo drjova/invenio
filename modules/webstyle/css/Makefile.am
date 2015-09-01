@@ -21,7 +21,7 @@ web_DATA = invenio.css \
            invenio-ie7.css \
            tablesorter.css \
            jquery.ajaxPager.css \
-           author_autocompletion.css
+           author_autocompletion.css \
            youtube.css
 
 EXTRA_DIST = $(web_DATA)
