@@ -1742,7 +1742,7 @@ def get_uploaded_files_for_docname(log_dir, docname):
     """
     return [file_path for action, bibdoc_name, file_path, rename, \
             description, comment, doctype, keep_previous_versions , \
-            file_restriction in read_actions_log(log_dir) \
+            file_restriction, copyright_license in read_actions_log(log_dir) \
             if action in ['revise', 'add', 'addFormat'] and \
                bibdoc_name == docname and os.path.exists(file_path)]
 
