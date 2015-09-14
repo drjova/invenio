@@ -349,7 +349,7 @@ class WebInterfaceRecordRecommendations(WebInterfaceDirectory):
 
         result = {}
         result['items'] = get_recommended_records(self.recid, uid,
-                collection="", threshold=55, maximum=3, shuffle=False)
+                collection="", threshold=55, maximum=3)
         result['loggedin'] = True if uid > 0 else False
         result['stat'] = 'ok'
 
