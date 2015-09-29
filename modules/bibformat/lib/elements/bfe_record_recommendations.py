@@ -40,7 +40,7 @@ $( document ).ready(function() {
                 $( "<p/>", {class: 'recommendations_contents',
                     text: "%(text_title)s:" }).appendTo(root);
 
-                $( "<p/>", {text: "%(text_login)s:" }).appendTo(root);
+                $( "<p/>", {text: "%(text_login)s" }).appendTo(root);
                 $(root).fadeIn("Slow");
             }
             return;
@@ -50,7 +50,7 @@ $( document ).ready(function() {
             text: "%(text_title)s:" }).appendTo(root);
         if (data.loggedin === false) {
             $( "<p/>", {class: 'recommendations_login',
-                text: "%(text_login)s:" }).appendTo(root);
+                text: "%(text_login)s" }).appendTo(root);
         }
         var list = $( "<ul/>", {
             "class": "record_recommendation",

@@ -33,7 +33,7 @@ from invenio.webuser import collect_user_info
 _OBELIX = None
 
 
-class Obelix_Not_Exist(object):
+class ObelixNotExist(object):
 
     """Empty Object, that accept everything without error."""
 
@@ -46,9 +46,11 @@ def get_obelix():
     """Create or get a Obelix instance."""
     global _OBELIX
 
+    recommendation_prefix = "recommendations::"
+
     if CFG_OBELIX_HOST == "":
         # Obelix is not used, so ignore all calls without error.
-        return Obelix_Not_Exist()
+        return ObelixNotExist()
     if _OBELIX is None:
         try:
             import json
@@ -61,13 +63,19 @@ def get_obelix():
                                              port=6379,
                                              db=0)
 
-            obelix_cache = RedisStorage(obelix_redis, encoder=json)
-            obelix_storage = RedisStorage(
-                obelix_redis, prefix=CFG_OBELIX_PREFIX, encoder=json)
+            obelix_cache = RedisStorage(obelix_redis, prefix=CFG_OBELIX_PREFIX,
+                                        encoder=json)
 
-            obelix_queue = RedisQueue(obelix_redis, encoder=json)
+            recommendation_storage = RedisStorage(obelix_redis,
+                                                  prefix=CFG_OBELIX_PREFIX +
+                                                  recommendation_prefix,
+                                                  encoder=json)
 
-            _OBELIX = Obelix(obelix_cache, obelix_storage, obelix_queue)
+            obelix_queue = RedisQueue(obelix_redis, prefix=CFG_OBELIX_PREFIX,
+                                      encoder=json)
+
+            _OBELIX = Obelix(obelix_cache, recommendation_storage,
+                             obelix_queue)
 
         except Exception:
             register_exception(alert_admin=True)
@@ -80,13 +88,12 @@ obelix = get_obelix()
 
 def clean_user_info(user_info):
     """Remove all unwanted information."""
-    clean_user_info = {'uid': user_info.get('uid'),
-                       'referer': user_info.get('referer'),
-                       'uri': user_info.get('uri'),
-                       'group': user_info.get('group'),
-                       '': user_info.get(''),
-                       }
-    return clean_user_info
+    return {'uid': user_info.get('uid'),
+            'referer': user_info.get('referer'),
+            'uri': user_info.get('uri'),
+            'group': user_info.get('group'),
+            '': user_info.get(''),
+            }
 
 
 def get_recommended_records(recid, user_id, collection="", threshold=70,
@@ -128,7 +135,7 @@ def get_recommended_records(recid, user_id, collection="", threshold=70,
                 authors = "; ".join(record.get('corporate_name.name', ""))
             else:
                 authors = "; ".join(record['authors.full_name'])
-        except (KeyError, ValueError):
+        except (KeyError, TypeError, ValueError):
             continue
 
         record_url = "%s/%s/%s" % (CFG_BASE_URL, CFG_SITE_RECORD,
@@ -138,11 +145,11 @@ def get_recommended_records(recid, user_id, collection="", threshold=70,
                                   [str(recid), str(sim_recid),
                                    str(rec_count), str(user_id)])
         suggestions.append({
-                            'number': rec_count,
-                            'record_url': url,
-                            'record_title': title.strip(),
-                            'record_authors': authors.strip(),
-                            })
+                           'number': rec_count,
+                           'record_url': url,
+                           'record_title': title.strip(),
+                           'record_authors': authors.strip(),
+                           })
         if rec_count >= maximum:
             break
         rec_count += 1
