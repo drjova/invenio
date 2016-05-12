@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -90,7 +90,7 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
                     "FROM query q, user_query uq "\
                     "WHERE uq.id_user=%s "\
                     "AND uq.id_query=q.id "\
-                    "ORDER BY q.id DESC"
+                    "ORDER BY uq.date DESC"
         params = (uid,)
     else:
         # permanent="y"
